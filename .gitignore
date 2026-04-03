@@ -35,7 +35,9 @@ Thumbs.db
 # Electron
 release/
 .config/
-site/
+site/node_modules/
+site/dist/
+site/.env
 .playwright-mcp/
 agent/.playwright-mcp/
 *.png
