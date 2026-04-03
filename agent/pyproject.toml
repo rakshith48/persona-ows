@@ -1,0 +1,16 @@
+[project]
+name = "persona-agent"
+version = "0.1.0"
+description = "Persona AI purchasing agent — powered by OWS"
+requires-python = ">=3.11"
+dependencies = [
+    "claude-agent-sdk>=0.1.50",
+    "open-wallet-standard>=1.2",
+    "httpx>=0.28",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+browser = ["browser-use>=0.12"]
+tts = ["kokoro>=0.7", "soundfile>=0.12", "numpy>=1.26"]
+all = ["persona-agent[browser,tts]"]

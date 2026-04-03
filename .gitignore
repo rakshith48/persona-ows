@@ -1,0 +1,38 @@
+node_modules/
+dist/
+dist-electron/
+out/
+.vite/
+*.js.map
+
+# Python
+agent/__pycache__/
+agent/.venv/
+agent/*.egg-info/
+*.pyc
+*.egg-info/
+
+# Data
+data/
+
+# Resources (large model files)
+resources/whisper/*.bin
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Electron
+release/
+.config/
+site/
