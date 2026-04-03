@@ -25,11 +25,9 @@ from claude_agent_sdk import (
 from config import ANTHROPIC_MODEL, ANTHROPIC_API_KEY
 from services.zinc_client import ZincClient
 from services.ows_wallet import OWSWallet
-from services.bitrefill_client import BitrefillClient
 # Singletons
 zinc = ZincClient()
 wallet = OWSWallet()
-bitrefill = BitrefillClient()
 
 
 SYSTEM_PROMPT = """You are Persona, a voice-first AI purchasing agent. You help the user buy things online.
@@ -67,7 +65,8 @@ Rules:
 - Show prices in USD.
 - If the user is just chatting (not buying), respond conversationally without using tools.
 - The user is in Australia. Merchant prices are in AUD. Your wallet balance is in USDC (roughly 1 USD). When comparing, approximate AUD to USD (1 AUD ≈ 0.65 USD).
-- For Bitrefill Visa gift cards in AU, use product_id "the-visa-digital-gift-card-australia" with denominations: 10, 50, 100, 250 AUD."""
+- For Bitrefill Visa gift cards in AU, use product_id "the-visa-digital-gift-card-australia" with denominations: 10, 50, 100, 250 AUD.
+- Always find the best deal for the user — compare prices, look for discounts, pick the best value option."""
 
 
 # --- Tool definitions ---
@@ -104,17 +103,6 @@ async def check_wallet_balance(args):
     except Exception as e:
         return {"content": [{"type": "text", "text": f"Wallet error: {e}"}], "is_error": True}
 
-
-@tool("buy_gift_card", "Purchase a Visa gift card via Bitrefill using USDC. Uses x402.", {"amount_usd": float})
-async def buy_gift_card(args):
-    amount = args.get("amount_usd", 0)
-    try:
-        if not bitrefill.is_configured:
-            return {"content": [{"type": "text", "text": "Payment not configured."}], "is_error": True}
-        result = await bitrefill.purchase_visa_card(amount)
-        return {"content": [{"type": "text", "text": json.dumps(result)}]}
-    except Exception as e:
-        return {"content": [{"type": "text", "text": f"Gift card error: {e}"}], "is_error": True}
 
 
 @tool("place_order", "Place an order on a retailer using Zinc API.", {
@@ -198,7 +186,7 @@ async def save_order(args):
 # Bundle tools into SDK MCP server (browser handled by browser-use skill)
 _tools_server = create_sdk_mcp_server("persona-tools", tools=[
     search_products, get_product_details, check_wallet_balance,
-    buy_gift_card, place_order, request_approval, save_order,
+    place_order, request_approval, save_order,
 ])
 
 # Global ref for approval tool to access the agent
@@ -209,7 +197,6 @@ _TOOL_STATUS = {
     "search_products": "Searching products...",
     "get_product_details": "Getting product details...",
     "check_wallet_balance": "Checking wallet...",
-    "buy_gift_card": "Purchasing gift card...",
     "place_order": "Placing order...",
     "request_approval": "Waiting for approval...",
     "Skill": "Loading skill...",

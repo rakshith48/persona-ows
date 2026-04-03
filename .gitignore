@@ -36,3 +36,6 @@ Thumbs.db
 release/
 .config/
 site/
+.playwright-mcp/
+agent/.playwright-mcp/
+*.png
