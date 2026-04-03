@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { ApprovalCard } from '../components/ApprovalCard'
+import { useVoice } from '../hooks/useVoice'
 
 interface Message {
   id: string
@@ -108,6 +109,16 @@ export function ChatPage() {
     inputRef.current?.focus()
   }, [input, status])
 
+  // Voice input
+  const handleVoiceTranscript = useCallback((text: string) => {
+    setInput(text)
+    // Auto-send after voice input
+    setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: 'user', text }])
+    setStatus('thinking')
+    window.persona.sendMessage(text)
+  }, [])
+  const voice = useVoice(handleVoiceTranscript)
+
   const isThinking = status === 'thinking' || status === 'searching' || status === 'purchasing' || status === 'tool_calling'
 
   return (
@@ -159,11 +170,18 @@ export function ChatPage() {
       {/* Input bar */}
       <div className="flex-shrink-0 p-3 border-t border-neutral-800/50">
         <div className="flex items-center gap-2">
-          {/* Voice button placeholder */}
+          {/* Voice button */}
           <button
-            className="no-drag flex-shrink-0 w-10 h-10 rounded-full bg-neutral-800 hover:bg-neutral-700
-                       flex items-center justify-center transition-colors text-neutral-400 hover:text-white"
-            title="Voice input (coming soon)"
+            onClick={voice.toggle}
+            disabled={isThinking || voice.state === 'loading'}
+            className={`no-drag flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+              voice.state === 'listening'
+                ? 'bg-red-500 text-white animate-pulse'
+                : voice.state === 'loading'
+                ? 'bg-neutral-800 text-neutral-500 opacity-50'
+                : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white'
+            }`}
+            title={voice.state === 'listening' ? 'Tap to stop' : 'Tap to speak'}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>

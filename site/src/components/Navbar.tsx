@@ -24,7 +24,7 @@ export function Navbar() {
         </a>
         <a
           href="#waitlist"
-          className="px-5 py-2 bg-gold-500/10 border border-gold-500/30 hover:bg-gold-500/20 text-gold-400 font-body text-xs uppercase tracking-widest rounded-lg transition-colors"
+          className="px-5 py-2 bg-gold-500/10 border border-gold-500/30 hover:bg-gold-500/20 text-gold-400 font-body text-[13px] uppercase tracking-widest rounded-lg transition-colors"
         >
           Join Waitlist
         </a>

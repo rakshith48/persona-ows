@@ -10,6 +10,7 @@
     "electron:dev": "vite --config vite.config.ts"
   },
   "dependencies": {
+    "@moonshine-ai/moonshine-js": "^0.1.29",
     "dotenv": "^17.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

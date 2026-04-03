@@ -66,7 +66,8 @@ Rules:
 - If the user is just chatting (not buying), respond conversationally without using tools.
 - The user is in Australia. Merchant prices are in AUD. Your wallet balance is in USDC (roughly 1 USD). When comparing, approximate AUD to USD (1 AUD ≈ 0.65 USD).
 - For Bitrefill Visa gift cards in AU, use product_id "the-visa-digital-gift-card-australia" with denominations: 10, 50, 100, 250 AUD.
-- Always find the best deal for the user — compare prices, look for discounts, pick the best value option."""
+- Always find the best deal for the user — compare prices, look for discounts, pick the best value option.
+- For fashion, clothing, or when you need to research products: use WebSearch to find options, then use browser-use to visit the best sites and browse them for the user."""
 
 
 # --- Tool definitions ---
@@ -220,7 +221,7 @@ class PersonaAgent:
         self._options = ClaudeAgentOptions(
             system_prompt=SYSTEM_PROMPT,
             model=ANTHROPIC_MODEL,
-            max_turns=25,
+            max_turns=100,
             mcp_servers={"persona": _tools_server},
             allowed_tools=[
                 "mcp__persona__*",      # Our custom tools
@@ -228,6 +229,7 @@ class PersonaAgent:
                 "Bash(browser-use:*)",   # browser-use CLI commands
                 "Bash(bitrefill:*)",     # bitrefill CLI commands
                 "Bash(ows:*)",           # OWS wallet commands (pay x402, check balance)
+                "WebSearch",             # Search the web for products, reviews, fashion
             ],
             permission_mode="dontAsk",
             setting_sources=["project"],  # Load .claude/skills/ from project dir
