@@ -49,12 +49,15 @@ For FOOD & SERVICES (Uber Eats, DoorDash, cafes, etc.):
 6. If approved: check_wallet_balance → use Bitrefill CLI to buy a Visa gift card → enter card at checkout via browser
 
 For PAYMENT (via Bitrefill CLI Skill + OWS):
-- Use `bitrefill search-products --query "visa" --country US` to find Visa gift cards
-- Use `bitrefill buy-products --cart_items '[{"product_id":"...", "package_id":...}]' --payment_method usdc_base` to purchase
+- FIRST try to find a merchant-specific gift card: `bitrefill search-products --query "<merchant name>" --country AU`
+  Example: for Uber Eats, search "uber eats". For Amazon, search "amazon". For 7-Eleven, search "7-eleven".
+- If a merchant-specific card exists, use it (cheaper, no conversion fees).
+- If no merchant-specific card exists, fall back to the AU Visa gift card: product_id "the-visa-digital-gift-card-australia" (denominations: 10, 50, 100, 250 AUD)
+- Buy: `bitrefill buy-products --cart_items '[{"product_id":"...", "package_id":...}]' --payment_method usdc_base`
 - This returns an x402_payment_url — pay it with:
   `ows pay request --wallet persona-agent --no-passphrase <x402_payment_url>`
 - After payment, use `bitrefill get-invoice-by-id --invoice_id <id> --include_redemption_info true` to get the gift card code
-- Use the code at checkout via browser
+- Use the code/redeem at checkout via browser
 
 Rules:
 - Be concise — this is voice-first. Keep responses short and conversational.
