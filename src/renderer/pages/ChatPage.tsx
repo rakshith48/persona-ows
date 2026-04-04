@@ -27,6 +27,8 @@ export function ChatPage() {
   const [status, setStatus] = useState<AgentStatus>('idle')
   const [statusDetail, setStatusDetail] = useState('')
   const [approval, setApproval] = useState<ApprovalRequest | null>(null)
+  const [notification, setNotification] = useState<string | null>(null)
+  const [notificationContext, setNotificationContext] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -56,14 +58,19 @@ export function ChatPage() {
         })
         setStatus('idle')
       } else if (msg.type === 'agent_text') {
+        const text = msg.text as string
+        // Auto-open OAuth URLs (calendar auth etc)
+        const oauthMatch = text.match(/(https:\/\/[^\s)]+authorize[^\s)]*)/i)
+        if (oauthMatch) {
+          window.persona.openUrl(oauthMatch[1])
+        }
         // Complete message — finalize any streaming message, or add new one
         setMessages((prev) => {
           const last = prev[prev.length - 1]
           if (last?.role === 'agent' && last.streaming) {
-            // Finalize the streaming message with the complete text
-            return [...prev.slice(0, -1), { ...last, text: msg.text as string, streaming: false }]
+            return [...prev.slice(0, -1), { ...last, text, streaming: false }]
           }
-          return [...prev, { id: crypto.randomUUID(), role: 'agent', text: msg.text as string }]
+          return [...prev, { id: crypto.randomUUID(), role: 'agent', text }]
         })
         setStatus('idle')
         setStatusDetail('')
@@ -73,6 +80,8 @@ export function ChatPage() {
         if (msg.status === 'done') setStatusDetail('')
       } else if (msg.type === 'approval_request') {
         setApproval(msg as unknown as ApprovalRequest)
+      } else if (msg.type === 'proactive_notification') {
+        setNotification(msg.text as string)
       }
     })
     return cleanup
@@ -123,6 +132,46 @@ export function ChatPage() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
+      {/* Proactive notification banner */}
+      {notification && (
+        <div className="mx-4 mt-2 bg-amber-900/20 border border-amber-700/40 rounded-xl p-4 flex-shrink-0">
+          <div className="text-sm text-amber-100 whitespace-pre-wrap">{notification}</div>
+          <input
+            type="text"
+            value={notificationContext}
+            onChange={(e) => setNotificationContext(e.target.value)}
+            placeholder="Add details... (e.g. make it a large, add a muffin)"
+            className="no-drag w-full mt-3 bg-neutral-800/80 text-white rounded-lg px-3 py-2 text-xs
+                       placeholder-neutral-500 outline-none focus:ring-1 focus:ring-amber-500/50"
+          />
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={() => {
+                const fullText = notificationContext
+                  ? `${notification}. Additional: ${notificationContext}`
+                  : notification
+                window.persona.proactiveApprove(fullText)
+                setNotification(null)
+                setNotificationContext('')
+              }}
+              className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors"
+            >
+              Yes, prep it
+            </button>
+            <button
+              onClick={() => {
+                window.persona.proactiveDismiss()
+                setNotification(null)
+                setNotificationContext('')
+              }}
+              className="px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-sm transition-colors"
+            >
+              No thanks
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-3">
         {messages.length === 0 && (

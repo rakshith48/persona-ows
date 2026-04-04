@@ -14,6 +14,8 @@ export interface PersonaAPI {
   sendMessage: (text: string) => Promise<void>
   onAgentMessage: (cb: (msg: Record<string, unknown>) => void) => () => void
   respondToApproval: (requestId: string, approved: boolean) => Promise<void>
+  proactiveApprove: (text: string) => Promise<void>
+  proactiveDismiss: () => Promise<void>
   getWalletInfo: () => Promise<WalletInfo>
   createDeposit: () => Promise<DepositInfo>
   openUrl: (url: string) => Promise<void>
@@ -34,6 +36,9 @@ contextBridge.exposeInMainWorld('persona', {
 
   respondToApproval: (requestId: string, approved: boolean) =>
     ipcRenderer.invoke('approval:respond', requestId, approved),
+
+  proactiveApprove: (text: string) => ipcRenderer.invoke('proactive:approve', text),
+  proactiveDismiss: () => ipcRenderer.invoke('proactive:dismiss'),
 
   getWalletInfo: () => ipcRenderer.invoke('wallet:getInfo'),
   createDeposit: () => ipcRenderer.invoke('wallet:createDeposit'),

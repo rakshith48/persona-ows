@@ -17,6 +17,16 @@ export function setupIpcHandlers(ipcMain: IpcMain, bridge: PythonBridge) {
     bridge.send({ type: 'approval_response', request_id: requestId, approved })
   })
 
+  // Proactive: user tapped "Yes, prep it"
+  ipcMain.handle('proactive:approve', (_event, text: string) => {
+    bridge.send({ type: 'proactive_approve', text })
+  })
+
+  // Proactive: user tapped "No thanks"
+  ipcMain.handle('proactive:dismiss', () => {
+    bridge.send({ type: 'proactive_dismiss' })
+  })
+
   // Wallet
   ipcMain.handle('wallet:getInfo', async () => getWalletInfo())
   ipcMain.handle('wallet:createDeposit', async () => createDeposit())
