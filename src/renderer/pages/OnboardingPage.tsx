@@ -15,6 +15,19 @@ export function OnboardingPage({ onComplete }: Props) {
   const [loadingDeposit, setLoadingDeposit] = useState(false)
   const [copied, setCopied] = useState('')
 
+  // Listen for OAuth URLs from the agent and auto-open them
+  useEffect(() => {
+    const cleanup = window.persona.onAgentMessage((msg) => {
+      if (msg.type === 'agent_text' && typeof msg.text === 'string') {
+        const match = (msg.text as string).match(/(https:\/\/[^\s)]+authorize[^\s)]*)/i)
+        if (match) {
+          window.persona.openUrl(match[1])
+        }
+      }
+    })
+    return cleanup
+  }, [])
+
   // Load wallet info on mount
   useEffect(() => {
     window.persona.getWalletInfo().then((info) => {
@@ -84,6 +97,24 @@ export function OnboardingPage({ onComplete }: Props) {
         <div className="text-xs text-blue-200 uppercase tracking-wider mb-1">USDC Balance</div>
         <div className="text-3xl font-bold text-white">${displayBalance.toFixed(2)}</div>
         {hasFunds && <div className="text-xs text-green-300 mt-1">Ready to shop</div>}
+      </div>
+
+      {/* Connect Calendar */}
+      <div className="bg-neutral-800/50 rounded-xl p-4 mb-4">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="text-xs text-neutral-400 uppercase tracking-wider">Google Calendar</div>
+        </div>
+        <div className="text-xs text-neutral-500 mb-3">
+          Connect your calendar so Persona can proactively suggest purchases based on your schedule.
+        </div>
+        <button
+          onClick={() => {
+            window.persona.sendMessage('Check my Google Calendar to test the connection. Just list one upcoming event.')
+          }}
+          className="w-full py-2 rounded-lg bg-neutral-700 hover:bg-neutral-600 text-neutral-300 text-sm transition-colors"
+        >
+          Connect Google Calendar
+        </button>
       </div>
 
       {/* Actions */}
