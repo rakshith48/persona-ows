@@ -234,6 +234,8 @@ class PersonaAgent:
                 "Bash(bitrefill:*)",     # bitrefill CLI commands
                 "Bash(ows:*)",           # OWS wallet commands (pay x402, check balance)
                 "WebSearch",             # Search the web for products, reviews, fashion
+                "Read",                  # Read context files
+                "Write",                 # Write memory files
             ],
             permission_mode="dontAsk",
             setting_sources=["project"],  # Load .claude/skills/ from project dir

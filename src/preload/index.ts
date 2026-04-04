@@ -23,6 +23,7 @@ export interface PersonaAPI {
   setSetting: (key: string, value: string) => Promise<void>
   getProfile: () => Promise<Record<string, unknown>>
   setProfile: (profile: Record<string, unknown>) => Promise<void>
+  uploadBankStatement: (csvContent: string) => Promise<void>
   getOrders: () => Promise<unknown[]>
   getConversations: () => Promise<unknown[]>
 }
@@ -51,6 +52,7 @@ contextBridge.exposeInMainWorld('persona', {
 
   getProfile: () => ipcRenderer.invoke('profile:get'),
   setProfile: (profile: Record<string, unknown>) => ipcRenderer.invoke('profile:set', profile),
+  uploadBankStatement: (csvContent: string) => ipcRenderer.invoke('bank:upload', csvContent),
 
   getOrders: () => ipcRenderer.invoke('db:getOrders'),
   getConversations: () => ipcRenderer.invoke('db:getConversations'),

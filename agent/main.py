@@ -85,6 +85,11 @@ async def main():
             from proactive import dismiss_notification
             dismiss_notification()
 
+        elif msg.get("type") == "analyze_bank_statement":
+            # Separate agent analyzes CSV
+            from proactive import analyze_bank_statement
+            asyncio.create_task(analyze_bank_statement(emit))
+
 
 async def _handle_message(agent: PersonaAgent, text: str):
     """Handle a user message in a background task."""

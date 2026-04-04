@@ -28,6 +28,8 @@ executing = False
 
 # --- Persistence ---
 
+MAX_SUGGESTIONS = 50
+
 def _load_suggested() -> list[str]:
     """Load list of already-suggested items (human-readable strings)."""
     try:
@@ -37,7 +39,8 @@ def _load_suggested() -> list[str]:
 
 
 def _save_suggested(items: list[str]):
-    SUGGESTED_FILE.write_text(json.dumps(items))
+    """Save suggestions, keeping only the most recent MAX_SUGGESTIONS."""
+    SUGGESTED_FILE.write_text(json.dumps(items[-MAX_SUGGESTIONS:]))
 
 
 def _load_profile() -> dict:
@@ -45,6 +48,14 @@ def _load_profile() -> dict:
         return json.loads((CONTEXT_DIR / "profile.json").read_text())
     except Exception:
         return {}
+
+
+def _load_recurring() -> list[dict]:
+    """Load recurring purchase patterns from bank statement analysis."""
+    try:
+        return json.loads((CONTEXT_DIR / "recurring.json").read_text())
+    except Exception:
+        return []
 
 
 def _load_location() -> dict | None:
@@ -94,6 +105,7 @@ async def run_decide(emit_fn: Callable[[dict], None]) -> str | None:
 
     profile = _load_profile()
     already_suggested = _load_suggested()
+    recurring = _load_recurring()
     location = _load_location()
     now = datetime.now()
 
@@ -101,11 +113,15 @@ async def run_decide(emit_fn: Callable[[dict], None]) -> str | None:
     if location:
         location_str = f"GPS: {location.get('lat', 0):.4f}, {location.get('lng', 0):.4f}"
 
+    recurring_str = "None — upload bank statement in Settings to enable"
+    if recurring:
+        recurring_str = json.dumps(recurring[:10], indent=2)  # Top 10 patterns
+
     prompt = DECIDE_PROMPT_TEMPLATE.format(
         time=now.strftime('%A %B %d, %I:%M %p'),
         profile=json.dumps(profile, indent=2) if profile else "No profile",
         already_suggested="\n".join(f"- {s}" for s in already_suggested) if already_suggested else "None yet",
-    ) + f"\n\nCurrent location: {location_str}"
+    ) + f"\n\nRecurring purchases (from bank history):\n{recurring_str}\n\nIf a recurring purchase is overdue (last_purchase + frequency_days ≤ today), suggest reordering.\n\nCurrent location: {location_str}"
 
     options = ClaudeAgentOptions(
         system_prompt="You are a proactive assistant. Check the calendar and decide if a purchase should be suggested. Be concise. Do NOT use browser or make purchases.",
@@ -238,3 +254,47 @@ def dismiss_notification():
     """Called when user dismisses the proactive notification."""
     global pending_notification
     pending_notification = False
+
+
+# --- Bank Statement Analysis (separate one-shot agent) ---
+
+BANK_ANALYSIS_PROMPT = """Read the bank statement CSV at agent/context/bank_statement.csv.
+
+Analyze ALL transactions and find recurring purchases — items bought 3+ times with a regular pattern.
+
+For each recurring purchase, extract:
+- merchant: the merchant/store name
+- item: what they typically buy (infer from description)
+- amount_avg: average transaction amount
+- frequency_days: how often they buy (in days)
+- last_purchase: date of the most recent transaction (YYYY-MM-DD)
+- category: food/coffee/health/transport/shopping/subscription/other
+
+Write the results as a JSON array to agent/context/recurring.json.
+
+After writing, summarize what you found."""
+
+
+async def analyze_bank_statement(emit_fn: Callable[[dict], None]):
+    """One-shot analysis of bank statement CSV. Writes recurring.json."""
+    emit_fn({"type": "proactive_log", "text": "[bank] starting analysis..."})
+    emit_fn({"type": "agent_text", "text": "Analyzing your bank statement for recurring purchases..."})
+
+    options = ClaudeAgentOptions(
+        system_prompt="You are a financial analyst. Analyze bank statement CSVs to find recurring purchase patterns. Be thorough but concise.",
+        model=ANTHROPIC_MODEL,
+        max_turns=10,
+        allowed_tools=["Read", "Write"],
+        permission_mode="dontAsk",
+        cwd=str(Path(__file__).parent.parent),
+        env={"ANTHROPIC_API_KEY": ANTHROPIC_API_KEY} if ANTHROPIC_API_KEY else {},
+    )
+
+    async for message in query(prompt=BANK_ANALYSIS_PROMPT, options=options):
+        if isinstance(message, AssistantMessage):
+            for block in message.content:
+                if isinstance(block, TextBlock) and block.text.strip():
+                    emit_fn({"type": "agent_text", "text": block.text})
+        elif isinstance(message, ResultMessage):
+            emit_fn({"type": "proactive_log", "text": f"[bank] analysis done"})
+            emit_fn({"type": "agent_status", "status": "done"})

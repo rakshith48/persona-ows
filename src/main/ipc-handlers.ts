@@ -40,6 +40,13 @@ export function setupIpcHandlers(ipcMain: IpcMain, bridge: PythonBridge) {
   ipcMain.handle('settings:get', async (_event, key: string) => getSetting(key))
   ipcMain.handle('settings:set', async (_event, key: string, value: string) => setSetting(key, value))
 
+  // Bank statement upload — triggers separate analysis agent
+  ipcMain.handle('bank:upload', async (_event, csvContent: string) => {
+    const csvPath = path.join(__dirname, '../../agent/context/bank_statement.csv')
+    fs.writeFileSync(csvPath, csvContent)
+    bridge.send({ type: 'analyze_bank_statement' })
+  })
+
   // Profile
   ipcMain.handle('profile:get', async () => {
     try {

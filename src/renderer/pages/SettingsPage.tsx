@@ -27,6 +27,7 @@ const DEFAULT_PROFILE: Profile = {
 export function SettingsPage() {
   const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE)
   const [saved, setSaved] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     window.persona.getProfile().then((p) => {
@@ -68,6 +69,31 @@ export function SettingsPage() {
         <Section title="Delivery Preferences">
           <Field label="Food delivery" value={profile.delivery_preferences.food} onChange={(v) => setProfile((p) => ({ ...p, delivery_preferences: { ...p.delivery_preferences, food: v } }))} />
           <Field label="Retail shipping" value={profile.delivery_preferences.retail} onChange={(v) => setProfile((p) => ({ ...p, delivery_preferences: { ...p.delivery_preferences, retail: v } }))} />
+        </Section>
+
+        <Section title="Bank Statement">
+          <div className="text-xs text-neutral-500 mb-2">
+            Upload a CSV of your bank transactions. Persona will find recurring purchases and proactively suggest reorders.
+          </div>
+          <label className="block w-full py-3 rounded-xl bg-neutral-700 hover:bg-neutral-600 text-neutral-300
+                            text-sm font-medium text-center cursor-pointer transition-colors">
+            {uploading ? 'Analyzing...' : 'Upload CSV'}
+            <input
+              type="file"
+              accept=".csv"
+              className="hidden"
+              disabled={uploading}
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                setUploading(true)
+                const text = await file.text()
+                await window.persona.uploadBankStatement(text)
+                setUploading(false)
+                e.target.value = ''
+              }}
+            />
+          </label>
         </Section>
 
         <button
