@@ -1,11 +1,11 @@
 {
   "name": "Rak",
-  "usual_coffee": "Iced latte, skim milk",
+  "usual_coffee": "latte, skim milk",
   "preferred_coffee_shop": "Starbucks",
   "girlfriend": "Sarah",
   "locations": {
     "home": "4/101 New South Head Rd, Edgecliff NSW 2027",
-    "work": "Level 5, 153 Kearny St, Sydney NSW 2000"
+    "work": "201 kent street, sydney cbd"
   },
   "delivery_preferences": {
     "food": "Deliver to home unless calendar event has a different location",

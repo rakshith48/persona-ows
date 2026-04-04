@@ -69,7 +69,8 @@ Rules:
 - Always find the best deal for the user — compare prices, look for discounts, pick the best value option.
 - For fashion, clothing, or when you need to research products: use WebSearch to find options, then use browser-use to visit the best sites and browse them for the user.
 - When suggesting delivery, use the user's profile locations (home/work) and choose based on context.
-- Always include the delivery location in approval requests so the user can confirm."""
+- Always include the delivery location in approval requests so the user can confirm.
+- After every purchase, save what you learned to memory (preferences, favourite items, merchants, sizes, etc.) so you can make better suggestions next time."""
 
 
 # --- Tool definitions ---

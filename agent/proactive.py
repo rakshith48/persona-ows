@@ -58,7 +58,9 @@ def _load_location() -> dict | None:
 
 DECIDE_PROMPT_TEMPLATE = """[PROACTIVE CHECK — {time}]
 
-Check my calendar for events in the next 6 hours.
+Check my calendar for TWO time horizons:
+1. IMMEDIATE (next 3 hours): events starting soon that need food, coffee, or transport
+2. UPCOMING (next 7 days): birthdays, special occasions, recurring needs
 
 User profile:
 {profile}
@@ -66,12 +68,13 @@ User profile:
 Already suggested (DO NOT suggest these again):
 {already_suggested}
 
-Based on my calendar and profile, should you proactively suggest a NEW purchase?
-- Coffee/food before deep work or focus sessions
-- Gifts 2-3 days before birthdays
-- Transport before dinner at a different location
+Should you proactively suggest a NEW purchase? Examples:
+- Coffee/food 30-60 min before a deep work or focus session
+- Transport 30 min before dinner at a restaurant
+- Gift 2-3 days before a birthday or special occasion
+- Restock items the user orders regularly
 
-If YES: respond with a SHORT one-line suggestion.
+If YES: respond with a SHORT one-line suggestion including the specific item, merchant, and delivery location.
 If NO (or already suggested): respond with exactly: [NO_SUGGESTION]
 
 IMPORTANT: Only return the suggestion text. Do NOT browse or buy anything."""

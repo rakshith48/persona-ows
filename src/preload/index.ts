@@ -21,6 +21,8 @@ export interface PersonaAPI {
   openUrl: (url: string) => Promise<void>
   getSetting: (key: string) => Promise<string | null>
   setSetting: (key: string, value: string) => Promise<void>
+  getProfile: () => Promise<Record<string, unknown>>
+  setProfile: (profile: Record<string, unknown>) => Promise<void>
   getOrders: () => Promise<unknown[]>
   getConversations: () => Promise<unknown[]>
 }
@@ -46,6 +48,9 @@ contextBridge.exposeInMainWorld('persona', {
 
   getSetting: (key: string) => ipcRenderer.invoke('settings:get', key),
   setSetting: (key: string, value: string) => ipcRenderer.invoke('settings:set', key, value),
+
+  getProfile: () => ipcRenderer.invoke('profile:get'),
+  setProfile: (profile: Record<string, unknown>) => ipcRenderer.invoke('profile:set', profile),
 
   getOrders: () => ipcRenderer.invoke('db:getOrders'),
   getConversations: () => ipcRenderer.invoke('db:getConversations'),

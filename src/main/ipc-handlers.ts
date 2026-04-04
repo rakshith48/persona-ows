@@ -1,7 +1,11 @@
 import { IpcMain, shell } from 'electron'
+import path from 'path'
+import fs from 'fs'
 import { PythonBridge } from './python-bridge'
 import { getOrders, saveOrder, saveMessage, getConversations, getSetting, setSetting } from './db'
 import { getWalletInfo, createDeposit } from './wallet'
+
+const PROFILE_PATH = path.join(__dirname, '../../agent/context/profile.json')
 
 const SESSION_ID = crypto.randomUUID()
 
@@ -35,6 +39,16 @@ export function setupIpcHandlers(ipcMain: IpcMain, bridge: PythonBridge) {
   // Settings
   ipcMain.handle('settings:get', async (_event, key: string) => getSetting(key))
   ipcMain.handle('settings:set', async (_event, key: string, value: string) => setSetting(key, value))
+
+  // Profile
+  ipcMain.handle('profile:get', async () => {
+    try {
+      return JSON.parse(fs.readFileSync(PROFILE_PATH, 'utf-8'))
+    } catch { return {} }
+  })
+  ipcMain.handle('profile:set', async (_event, profile: Record<string, unknown>) => {
+    fs.writeFileSync(PROFILE_PATH, JSON.stringify(profile, null, 2))
+  })
 
   // Database
   ipcMain.handle('db:getOrders', async () => getOrders())

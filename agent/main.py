@@ -10,7 +10,7 @@ import threading
 from agent import PersonaAgent
 
 # Proactive check interval (seconds)
-PROACTIVE_INTERVAL = 120  # 2 min for demo, 1800 for prod
+PROACTIVE_INTERVAL = 1800  # 30 min
 
 
 def emit(msg: dict):

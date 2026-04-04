@@ -67,21 +67,25 @@ app.whenReady().then(async () => {
 
   // Poll GPS and write to context/location.json for the proactive engine
   const locationFile = path.join(__dirname, '../../agent/context/location.json')
-  setInterval(() => {
+  const pollLocation = () => {
     mainWindow?.webContents.executeJavaScript(`
       new Promise((res) => {
         navigator.geolocation.getCurrentPosition(
           (pos) => res({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy, timestamp: Date.now() }),
-          () => res(null),
-          { timeout: 5000 }
+          (err) => res(null),
+          { timeout: 10000, enableHighAccuracy: true }
         )
       })
-    `).then((loc) => {
+    `).then((loc: unknown) => {
       if (loc) {
         fs.writeFileSync(locationFile, JSON.stringify(loc, null, 2))
+        console.log('[location] updated:', JSON.stringify(loc).slice(0, 60))
       }
     }).catch(() => {})
-  }, 60000) // Update every 60 seconds
+  }
+  // First poll after 5s (wait for renderer), then every 60s
+  setTimeout(pollLocation, 5000)
+  setInterval(pollLocation, 60000)
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
