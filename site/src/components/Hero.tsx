@@ -24,9 +24,28 @@ export function Hero() {
             <span className="italic text-gold-400">it for you.</span>
           </h1>
 
-          <p className="hero-animate hero-delay-3 font-body text-lg text-neutral-400 leading-relaxed max-w-md mb-8">
+          <p className="hero-animate hero-delay-3 font-body text-lg text-neutral-400 leading-relaxed max-w-md mb-6">
             Persona learns what you need, suggests before you ask, and handles the purchase — voice, chat, or on autopilot. Paid with crypto, delivered to your door.
           </p>
+
+          {/* Mobile: compact notification card */}
+          <div className="hero-animate hero-delay-4 lg:hidden mb-6">
+            <div className="bg-[#131313] border border-neutral-700/60 rounded-xl p-4 max-w-sm">
+              <div className="bg-gold-500/10 border border-gold-500/20 rounded-lg px-3.5 py-3 mb-3 font-body">
+                <span className="text-gold-400 text-xs font-medium block mb-1">Suggestion</span>
+                <span className="text-neutral-200 text-[13px]">
+                  Standup at <span className="text-ice-400 font-medium">9:30am</span>. Order your usual oat latte?
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-[13px] text-neutral-400 font-body">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  Ordering from Uber Eats
+                </div>
+                <span className="text-ice-400 font-medium text-[13px] font-body">$6.50</span>
+              </div>
+            </div>
+          </div>
 
           <div className="hero-animate hero-delay-4 flex flex-col sm:flex-row gap-3">
             <a
@@ -47,7 +66,7 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Right: Chat mockup */}
+        {/* Right: Full chat mockup — desktop only */}
         <div className="hero-animate hero-delay-4 hidden lg:block flex-shrink-0">
           <div className="relative w-[340px]">
             {/* Phone frame */}
@@ -65,7 +84,6 @@ export function Hero() {
 
               {/* Chat messages — proactive suggestion */}
               <div className="space-y-2.5 mb-5">
-                {/* Proactive notification */}
                 <div className="max-w-[90%] bg-gold-500/10 border border-gold-500/20 text-neutral-100 text-[13px] px-3.5 py-2.5 rounded-2xl rounded-bl-md font-body">
                   <span className="text-gold-400 text-xs font-medium block mb-1">Suggestion</span>
                   You have a standup at <span className="text-ice-400 font-medium">9:30am</span>. Want me to order your usual oat latte from Uber Eats?
