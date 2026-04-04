@@ -25,7 +25,7 @@ export function Hero() {
           </h1>
 
           <p className="hero-animate hero-delay-3 font-body text-lg text-neutral-400 leading-relaxed max-w-md mb-8">
-            Tell Persona what you need. It searches the best deals, you approve with one tap, and it handles the rest — paid with crypto, delivered to your door.
+            Persona learns what you need, suggests before you ask, and handles the purchase — voice, chat, or on autopilot. Paid with crypto, delivered to your door.
           </p>
 
           <div className="hero-animate hero-delay-4 flex flex-col sm:flex-row gap-3">
@@ -63,21 +63,20 @@ export function Hero() {
                 </div>
               </div>
 
-              {/* Chat messages */}
+              {/* Chat messages — proactive suggestion */}
               <div className="space-y-2.5 mb-5">
-                <div className="ml-auto max-w-[80%] bg-blue-600 text-white text-[13px] px-3.5 py-2 rounded-2xl rounded-br-md font-body">
-                  Order me a USB-C hub for my MacBook
-                </div>
-                <div className="max-w-[85%] bg-neutral-800 text-neutral-100 text-[13px] px-3.5 py-2 rounded-2xl rounded-bl-md font-body">
-                  Found 3 options on Amazon. The best rated is the Anker 7-in-1 for <span className="text-ice-400 font-medium">$29.99</span>. Want me to order it?
+                {/* Proactive notification */}
+                <div className="max-w-[90%] bg-gold-500/10 border border-gold-500/20 text-neutral-100 text-[13px] px-3.5 py-2.5 rounded-2xl rounded-bl-md font-body">
+                  <span className="text-gold-400 text-xs font-medium block mb-1">Suggestion</span>
+                  You have a standup at <span className="text-ice-400 font-medium">9:30am</span>. Want me to order your usual oat latte from Uber Eats?
                 </div>
                 <div className="ml-auto max-w-[80%] bg-blue-600 text-white text-[13px] px-3.5 py-2 rounded-2xl rounded-br-md font-body">
                   Yes, go ahead
                 </div>
                 <div className="max-w-[85%] bg-neutral-800 text-neutral-200 text-[13px] px-3.5 py-2 rounded-2xl rounded-bl-md font-body flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-neutral-400">Processing order</span>
-                  <span className="cursor-blink text-gold-400">|</span>
+                  <span className="text-neutral-400">Ordering from Uber Eats</span>
+                  <span className="text-ice-400 font-medium text-xs ml-auto">$6.50</span>
                 </div>
               </div>
 

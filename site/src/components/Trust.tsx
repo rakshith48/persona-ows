@@ -13,6 +13,10 @@ const points = [
     title: 'No data harvesting',
     desc: 'Conversations and order history stay on your machine. We don\'t sell your data or build ad profiles.',
   },
+  {
+    title: 'Runs locally',
+    desc: 'Voice recognition, memory, and preferences all process on your device. No audio or purchase history leaves your machine.',
+  },
 ]
 
 export function Trust() {
