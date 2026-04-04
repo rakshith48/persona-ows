@@ -66,7 +66,11 @@ Rules:
 - If the user is just chatting (not buying), respond conversationally without using tools.
 - The user is in Australia. Merchant prices are in AUD. Your wallet balance is in USDC (roughly 1 USD). When comparing, approximate AUD to USD (1 AUD ≈ 0.65 USD).
 - For Bitrefill Visa gift cards in AU, use product_id "the-visa-digital-gift-card-australia" with denominations: 10, 50, 100, 250 AUD.
-- Always find the best deal for the user — compare prices, look for discounts, pick the best value option."""
+- Always find the best deal for the user — compare prices, look for discounts, pick the best value option.
+- For fashion, clothing, or when you need to research products: use WebSearch to find options, then use browser-use to visit the best sites and browse them for the user.
+- When suggesting delivery, use the user's profile locations (home/work) and choose based on context.
+- Always include the delivery location in approval requests so the user can confirm.
+- After every purchase, save what you learned to memory (preferences, favourite items, merchants, sizes, etc.) so you can make better suggestions next time."""
 
 
 # --- Tool definitions ---
@@ -149,7 +153,7 @@ async def request_approval(args):
     })
 
     future: asyncio.Future[bool] = asyncio.get_event_loop().create_future()
-    agent._approval_futures[request_id] = future
+    _global_approval_futures[request_id] = future
 
     try:
         approved = await asyncio.wait_for(future, timeout=120)
@@ -189,8 +193,9 @@ _tools_server = create_sdk_mcp_server("persona-tools", tools=[
     place_order, request_approval, save_order,
 ])
 
-# Global ref for approval tool to access the agent
+# Global ref for approval tool to access emit function and futures
 _agent_ref = None
+_global_approval_futures: dict[str, asyncio.Future] = {}
 
 # Status map for tool use display
 _TOOL_STATUS = {
@@ -220,7 +225,7 @@ class PersonaAgent:
         self._options = ClaudeAgentOptions(
             system_prompt=SYSTEM_PROMPT,
             model=ANTHROPIC_MODEL,
-            max_turns=25,
+            max_turns=100,
             mcp_servers={"persona": _tools_server},
             allowed_tools=[
                 "mcp__persona__*",      # Our custom tools
@@ -228,6 +233,9 @@ class PersonaAgent:
                 "Bash(browser-use:*)",   # browser-use CLI commands
                 "Bash(bitrefill:*)",     # bitrefill CLI commands
                 "Bash(ows:*)",           # OWS wallet commands (pay x402, check balance)
+                "WebSearch",             # Search the web for products, reviews, fashion
+                "Read",                  # Read context files
+                "Write",                 # Write memory files
             ],
             permission_mode="dontAsk",
             setting_sources=["project"],  # Load .claude/skills/ from project dir
@@ -292,6 +300,11 @@ class PersonaAgent:
 
     def resolve_approval(self, request_id: str, approved: bool):
         """Resolve a pending approval request from the UI."""
-        future = self._approval_futures.pop(request_id, None)
-        if future and not future.done():
-            future.set_result(approved)
+        resolve_approval_global(request_id, approved)
+
+
+def resolve_approval_global(request_id: str, approved: bool):
+    """Resolve approval from any session (main agent or proactive executor)."""
+    future = _global_approval_futures.pop(request_id, None)
+    if future and not future.done():
+        future.set_result(approved)

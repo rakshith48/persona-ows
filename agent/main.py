@@ -1,13 +1,16 @@
 """
 Persona Agent — stdio JSON protocol server.
 
-Starts the agent, reads stdin for user messages, feeds them to the agent.
+Main chat agent + proactive suggestion engine (three stages).
 """
 import sys
 import json
 import asyncio
 import threading
 from agent import PersonaAgent
+
+# Proactive check interval (seconds)
+PROACTIVE_INTERVAL = 1800  # 30 min
 
 
 def emit(msg: dict):
@@ -24,10 +27,28 @@ def read_stdin(loop: asyncio.AbstractEventLoop, queue: asyncio.Queue):
             asyncio.run_coroutine_threadsafe(queue.put(line), loop)
 
 
+async def proactive_loop():
+    """Stage 1: Lightweight decision checks on a timer."""
+    from proactive import run_decide
+
+    await asyncio.sleep(15)  # Wait for app to initialize
+
+    while True:
+        try:
+            await run_decide(emit)
+        except Exception as e:
+            emit({"type": "proactive_log", "text": f"[proactive] error: {e}"})
+
+        await asyncio.sleep(PROACTIVE_INTERVAL)
+
+
 async def main():
     agent = PersonaAgent(emit_fn=emit)
     await agent.start()
     emit({"type": "agent_status", "status": "ready"})
+
+    # Start proactive Stage 1 loop
+    asyncio.create_task(proactive_loop())
 
     # Read stdin in a background thread
     stdin_queue: asyncio.Queue[str] = asyncio.Queue()
@@ -44,14 +65,30 @@ async def main():
             continue
 
         if msg.get("type") == "user_message":
-            # Run as background task so stdin loop stays free for approval responses
             asyncio.create_task(_handle_message(agent, msg.get("text", "")))
 
         elif msg.get("type") == "approval_response":
-            agent.resolve_approval(
+            from agent import resolve_approval_global
+            resolve_approval_global(
                 msg.get("request_id", ""),
                 msg.get("approved", False),
             )
+
+        elif msg.get("type") == "proactive_approve":
+            # User tapped "Yes, prep it" — trigger Stage 2+3
+            from proactive import run_execute
+            suggestion = msg.get("text", "")
+            asyncio.create_task(run_execute(suggestion, emit))
+
+        elif msg.get("type") == "proactive_dismiss":
+            # User tapped "No thanks"
+            from proactive import dismiss_notification
+            dismiss_notification()
+
+        elif msg.get("type") == "analyze_bank_statement":
+            # Separate agent analyzes CSV
+            from proactive import analyze_bank_statement
+            asyncio.create_task(analyze_bank_statement(emit))
 
 
 async def _handle_message(agent: PersonaAgent, text: str):

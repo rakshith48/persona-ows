@@ -14,11 +14,16 @@ export interface PersonaAPI {
   sendMessage: (text: string) => Promise<void>
   onAgentMessage: (cb: (msg: Record<string, unknown>) => void) => () => void
   respondToApproval: (requestId: string, approved: boolean) => Promise<void>
+  proactiveApprove: (text: string) => Promise<void>
+  proactiveDismiss: () => Promise<void>
   getWalletInfo: () => Promise<WalletInfo>
   createDeposit: () => Promise<DepositInfo>
   openUrl: (url: string) => Promise<void>
   getSetting: (key: string) => Promise<string | null>
   setSetting: (key: string, value: string) => Promise<void>
+  getProfile: () => Promise<Record<string, unknown>>
+  setProfile: (profile: Record<string, unknown>) => Promise<void>
+  uploadBankStatement: (csvContent: string) => Promise<void>
   getOrders: () => Promise<unknown[]>
   getConversations: () => Promise<unknown[]>
 }
@@ -35,12 +40,19 @@ contextBridge.exposeInMainWorld('persona', {
   respondToApproval: (requestId: string, approved: boolean) =>
     ipcRenderer.invoke('approval:respond', requestId, approved),
 
+  proactiveApprove: (text: string) => ipcRenderer.invoke('proactive:approve', text),
+  proactiveDismiss: () => ipcRenderer.invoke('proactive:dismiss'),
+
   getWalletInfo: () => ipcRenderer.invoke('wallet:getInfo'),
   createDeposit: () => ipcRenderer.invoke('wallet:createDeposit'),
   openUrl: (url: string) => ipcRenderer.invoke('wallet:openUrl', url),
 
   getSetting: (key: string) => ipcRenderer.invoke('settings:get', key),
   setSetting: (key: string, value: string) => ipcRenderer.invoke('settings:set', key, value),
+
+  getProfile: () => ipcRenderer.invoke('profile:get'),
+  setProfile: (profile: Record<string, unknown>) => ipcRenderer.invoke('profile:set', profile),
+  uploadBankStatement: (csvContent: string) => ipcRenderer.invoke('bank:upload', csvContent),
 
   getOrders: () => ipcRenderer.invoke('db:getOrders'),
   getConversations: () => ipcRenderer.invoke('db:getConversations'),
