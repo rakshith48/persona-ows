@@ -40,5 +40,7 @@ site/dist/
 site/.env
 .playwright-mcp/
 agent/.playwright-mcp/
-*.png
+# Screenshots (except docs/)
+/*.png
+!docs/screenshots/*.png
 agent/context/.suggested.json

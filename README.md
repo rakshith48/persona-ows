@@ -4,6 +4,15 @@ A voice-first AI purchasing agent that buys things for you. Say what you want, a
 
 Built with the [Claude Agent SDK](https://platform.claude.com/docs/en/agent-sdk/overview), [Open Wallet Standard (OWS)](https://openwallet.sh/), and [Bitrefill](https://www.bitrefill.com/) for the [OWS Hackathon](https://hackathon.openwallet.sh/).
 
+<p align="center">
+  <img src="docs/screenshots/proactive-suggestion.png" width="400" alt="Proactive suggestion — coffee before deep work" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/approval-card.png" width="300" alt="Approval card with price breakdown" />
+  <img src="docs/screenshots/order-placed.png" width="300" alt="Order placed confirmation" />
+</p>
+
 ## How It Works
 
 ```
