@@ -37,10 +37,10 @@ export function HowItWorks() {
   const ref = useScrollReveal()
 
   return (
-    <section id="how-it-works" className="py-28 px-6">
+    <section id="how-it-works" className="py-16 sm:py-20 px-6">
       <div ref={ref} className="reveal max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-xs font-body uppercase tracking-[0.25em] text-gold-500/70 mb-4 block">
+        <div className="text-center mb-10">
+          <span className="text-[13px] font-body uppercase tracking-[0.25em] text-gold-500/70 mb-3 block">
             How It Works
           </span>
           <h2 className="font-display text-4xl sm:text-5xl text-white">
@@ -48,21 +48,21 @@ export function HowItWorks() {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-5">
           {steps.map((step, i) => (
             <div
               key={step.num}
-              className={`reveal reveal-delay-${i + 1} group relative bg-[#111] border border-neutral-800/60 rounded-2xl p-8 hover:border-gold-500/30 transition-all duration-500 hover:-translate-y-1`}
+              className={`reveal reveal-delay-${i + 1} group relative bg-[#151515] border border-neutral-700/50 rounded-xl p-7 hover:border-gold-500/30 transition-all duration-500 hover:-translate-y-1`}
             >
               {/* Step number */}
-              <div className="text-6xl font-display text-neutral-800/50 group-hover:text-gold-500/20 absolute top-4 right-6 transition-colors duration-500">
+              <div className="text-5xl font-display text-neutral-700/60 group-hover:text-gold-500/25 absolute top-3 right-5 transition-colors duration-500">
                 {step.num}
               </div>
 
               <div className="relative z-10">
-                <div className="text-gold-500 mb-5">{step.icon}</div>
-                <h3 className="font-display text-2xl text-white mb-3 italic">{step.title}</h3>
-                <p className="font-body text-sm text-neutral-400 leading-relaxed">{step.desc}</p>
+                <div className="text-gold-500 mb-4">{step.icon}</div>
+                <h3 className="font-display text-2xl text-white mb-2 italic font-medium">{step.title}</h3>
+                <p className="font-body text-sm text-neutral-300 leading-relaxed">{step.desc}</p>
               </div>
             </div>
           ))}

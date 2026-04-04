@@ -44,10 +44,10 @@ export function Features() {
   const ref = useScrollReveal()
 
   return (
-    <section className="py-28 px-6">
+    <section className="py-16 sm:py-20 px-6">
       <div ref={ref} className="reveal max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-xs font-body uppercase tracking-[0.25em] text-gold-500/70 mb-4 block">
+        <div className="text-center mb-10">
+          <span className="text-[13px] font-body uppercase tracking-[0.25em] text-gold-500/70 mb-3 block">
             Features
           </span>
           <h2 className="font-display text-4xl sm:text-5xl text-white">
@@ -55,24 +55,24 @@ export function Features() {
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className="grid sm:grid-cols-2 gap-5">
           {features.map((feat, i) => (
             <div
               key={feat.title}
-              className={`reveal reveal-delay-${i + 1} group relative overflow-hidden bg-[#111] border border-neutral-800/60 rounded-2xl p-8 hover:border-gold-500/20 transition-all duration-500`}
+              className={`reveal reveal-delay-${i + 1} group relative overflow-hidden bg-[#151515] border border-neutral-700/50 rounded-xl p-7 hover:border-gold-500/25 transition-all duration-500`}
             >
               {/* Hover glow */}
               <div
-                className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(212,168,83,0.08), transparent 70%)' }}
+                className="absolute -top-16 -right-16 w-36 h-36 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+                style={{ background: 'radial-gradient(circle, rgba(212,168,83,0.1), transparent 70%)' }}
               />
 
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-gold-500/10 border border-gold-500/20 flex items-center justify-center text-gold-400 mb-5">
+                <div className="w-11 h-11 rounded-lg bg-gold-500/10 border border-gold-500/25 flex items-center justify-center text-gold-400 mb-4">
                   {feat.icon}
                 </div>
-                <h3 className="font-display text-xl text-white mb-2 italic">{feat.title}</h3>
-                <p className="font-body text-sm text-neutral-400 leading-relaxed">{feat.desc}</p>
+                <h3 className="font-display text-xl text-white mb-2 italic font-medium">{feat.title}</h3>
+                <p className="font-body text-sm text-neutral-300 leading-relaxed">{feat.desc}</p>
               </div>
             </div>
           ))}

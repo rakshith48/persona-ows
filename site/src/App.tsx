@@ -11,13 +11,13 @@ export function App() {
     <main className="min-h-screen">
       <Navbar />
       <Hero />
-      <div className="gold-line max-w-4xl mx-auto" />
+      <div className="gold-line max-w-5xl mx-auto" />
       <HowItWorks />
-      <div className="gold-line max-w-4xl mx-auto" />
+      <div className="gold-line max-w-5xl mx-auto" />
       <Features />
-      <div className="gold-line max-w-4xl mx-auto" />
+      <div className="gold-line max-w-5xl mx-auto" />
       <Trust />
-      <div className="gold-line max-w-4xl mx-auto" />
+      <div className="gold-line max-w-5xl mx-auto" />
       <Waitlist />
       <Footer />
     </main>
